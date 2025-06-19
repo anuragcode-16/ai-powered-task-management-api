@@ -1,0 +1,108 @@
+const mongoose = require('mongoose');
+
+const taskSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, 'Task title is required'],
+    trim: true,
+    maxlength: [100, 'Title cannot exceed 100 characters']
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Description cannot exceed 500 characters']
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'in-progress', 'completed', 'cancelled'],
+    default: 'pending'
+  },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: [true, 'Category is required']
+  },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Task must be assigned to a user']
+  },
+  dueDate: {
+    type: Date,
+    required: [true, 'Due date is required']
+  },
+  estimatedHours: {
+    type: Number,
+    min: [0.5, 'Estimated hours must be at least 0.5'],
+    max: [40, 'Estimated hours cannot exceed 40']
+  },
+  actualHours: {
+    type: Number,
+    min: [0, 'Actual hours cannot be negative'],
+    default: 0
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  attachments: [{
+    filename: String,
+    url: String,
+    uploadDate: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  completedAt: {
+    type: Date
+  },
+  isArchived: {
+    type: Boolean,
+    default: false
+  }
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual for calculating if task is overdue
+taskSchema.virtual('isOverdue').get(function() {
+  return this.dueDate < new Date() && this.status !== 'completed';
+});
+
+// Virtual for calculating progress percentage
+taskSchema.virtual('progressPercentage').get(function() {
+  if (this.status === 'completed') return 100;
+  if (this.status === 'in-progress') return 50;
+  if (this.status === 'pending') return 0;
+  return 0;
+});
+
+// Index for better query performance
+taskSchema.index({ assignedTo: 1, status: 1 });
+taskSchema.index({ dueDate: 1 });
+taskSchema.index({ priority: 1 });
+taskSchema.index({ category: 1 });
+
+// Pre-save middleware
+taskSchema.pre('save', function(next) {
+  // Set completedAt when status changes to completed
+  if (this.isModified('status') && this.status === 'completed' && !this.completedAt) {
+    this.completedAt = new Date();
+  }
+  
+  // Clear completedAt if status changes from completed
+  if (this.isModified('status') && this.status !== 'completed') {
+    this.completedAt = undefined;
+  }
+  
+  next();
+});
+
+module.exports = mongoose.model('Task', taskSchema); 
