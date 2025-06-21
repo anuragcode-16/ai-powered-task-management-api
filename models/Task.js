@@ -105,4 +105,49 @@ taskSchema.pre('save', function(next) {
   next();
 });
 
+// Post-save middleware for gamification
+taskSchema.post('save', async function(doc, next) {
+  // Award XP when task is completed
+  if (doc.isModified('status') && doc.status === 'completed') {
+    try {
+      const { Gamification } = require('./Gamification');
+      const gamification = await Gamification.findOne({ user: doc.assignedTo });
+      
+      if (gamification) {
+        // Calculate XP based on priority and estimated hours
+        let xp = 10; // Base XP
+        
+        // Priority multiplier
+        const priorityMultiplier = {
+          'low': 1,
+          'medium': 1.5,
+          'high': 2,
+          'urgent': 3
+        };
+        
+        xp *= priorityMultiplier[doc.priority] || 1;
+        
+        // Hours multiplier (more XP for longer tasks)
+        if (doc.estimatedHours) {
+          xp += doc.estimatedHours * 2;
+        }
+        
+        // Round to nearest integer
+        xp = Math.round(xp);
+        
+        await gamification.addExperience(xp, 'task_completion');
+        await gamification.updateStreak('tasks', true);
+        gamification.statistics.tasksCompleted += 1;
+        await gamification.save();
+        
+        console.log(`✅ Awarded ${xp} XP for task completion: ${doc.title}`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to update gamification for task completion:', error);
+    }
+  }
+  
+  next();
+});
+
 module.exports = mongoose.model('Task', taskSchema); 

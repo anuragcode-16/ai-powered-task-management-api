@@ -1,11 +1,12 @@
 {
-  "name": "personal-task-management-api",
-  "version": "1.0.0",
-  "description": "A comprehensive RESTful API for personal task management with advanced analytics",
+  "name": "ai-powered-task-management-api",
+  "version": "2.0.0",
+  "description": "An AI-powered comprehensive RESTful API for personal task management with gamification, habit tracking, and team collaboration features",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "init": "node scripts/init-achievements.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -15,9 +16,13 @@
     "express",
     "mongodb",
     "analytics",
-    "rest-api"
+    "rest-api",
+    "ai-powered",
+    "gamification",
+    "habit-tracking",
+    "collaboration"
   ],
-  "author": "API Fellowship Session 2",
+  "author": "Anurag Dey (anuragcode-16)",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,7 +31,9 @@
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
     "compression": "^1.8.0",

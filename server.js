@@ -41,14 +41,26 @@ app.use('/api/v1/analytics', analyticsRoutes);
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 Welcome to Task Management API - API Fellowship Session 2',
-    version: '1.0.0',
-    author: 'Sorbojit Mondal',
+    message: '🚀 Welcome to AI-Powered Task Management API - Built by Anurag Dey',
+    version: '2.0.0',
+    author: 'Anurag Dey (@anuragcode-16)',
+    github: 'https://github.com/anuragcode-16',
+    uniqueFeatures: [
+      '🤖 AI-powered task recommendations',
+      '🎮 Gamification system with XP and achievements',
+      '📊 Advanced habit tracking',
+      '👥 Team collaboration features',
+      '🔔 Smart notification system',
+      '📈 Real-time productivity analytics'
+    ],
     endpoints: {
       tasks: '/api/v1/tasks',
       users: '/api/v1/users',
       categories: '/api/v1/categories',
-      analytics: '/api/v1/analytics'
+      analytics: '/api/v1/analytics',
+      habits: '/api/v1/habits',
+      gamification: '/api/v1/gamification',
+      collaboration: '/api/v1/collaboration'
     },
     documentation: 'Check README.md for detailed API documentation'
   });
