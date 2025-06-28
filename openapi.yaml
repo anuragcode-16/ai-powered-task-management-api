@@ -1,0 +1,953 @@
+openapi: 3.0.3
+info:
+  title: AI-Powered Personal Task Management API
+  description: A comprehensive RESTful API for personal task management with gamification, habit tracking, and AI-powered recommendations
+  version: 2.0.0
+  contact:
+    name: Anurag Dey
+    email: anuragcode.16@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.taskmanagement.com
+    description: Production server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Check API health status and system information
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  # User Management
+  /api/v1/users:
+    get:
+      summary: Get all users
+      description: Retrieve all users with filtering and pagination
+      tags:
+        - Users
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [user, admin, manager]
+        - name: department
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponse'
+
+  /api/v1/users/{id}:
+    get:
+      summary: Get user by ID
+      description: Retrieve a specific user by their ID
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+
+  /api/v1/users/register:
+    post:
+      summary: Register new user
+      description: Create a new user account
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '409':
+          description: User already exists
+
+  /api/v1/users/login:
+    post:
+      summary: User login
+      description: Authenticate user and return token
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+
+  # Task Management
+  /api/v1/tasks:
+    get:
+      summary: Get all tasks
+      description: Retrieve all tasks with filtering and pagination
+      tags:
+        - Tasks
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in-progress, completed, cancelled]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, urgent]
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: assignedTo
+          in: query
+          schema:
+            type: string
+        - name: overdue
+          in: query
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TasksResponse'
+
+    post:
+      summary: Create new task
+      description: Create a new task
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+  /api/v1/tasks/{id}:
+    get:
+      summary: Get task by ID
+      description: Retrieve a specific task by its ID
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '404':
+          description: Task not found
+
+    put:
+      summary: Update task
+      description: Update an existing task
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+
+    delete:
+      summary: Delete task
+      description: Delete a task
+      tags:
+        - Tasks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task deleted successfully
+
+  # Categories
+  /api/v1/categories:
+    get:
+      summary: Get all categories
+      description: Retrieve all task categories
+      tags:
+        - Categories
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+
+    post:
+      summary: Create new category
+      description: Create a new task category
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        '201':
+          description: Category created successfully
+
+  # Habits
+  /api/v1/habits:
+    get:
+      summary: Get all habits
+      description: Retrieve all habits for the user
+      tags:
+        - Habits
+      responses:
+        '200':
+          description: Habits retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HabitsResponse'
+
+    post:
+      summary: Create new habit
+      description: Create a new habit
+      tags:
+        - Habits
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HabitCreate'
+      responses:
+        '201':
+          description: Habit created successfully
+
+  # Gamification
+  /api/v1/gamification/{userId}:
+    get:
+      summary: Get user gamification data
+      description: Retrieve gamification data for a specific user
+      tags:
+        - Gamification
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Gamification data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamificationResponse'
+
+  # AI Recommendations
+  /api/v1/ai/recommendations/{userId}:
+    get:
+      summary: Get AI task recommendations
+      description: Get AI-powered task recommendations for a user
+      tags:
+        - AI Recommendations
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recommendations retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+
+components:
+  schemas:
+    # Health Schema
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "OK"
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: string
+          example: "45 minutes"
+        memory:
+          type: object
+          properties:
+            used:
+              type: string
+              example: "128 MB"
+            total:
+              type: string
+              example: "512 MB"
+        database:
+          type: string
+          example: "Connected"
+        version:
+          type: string
+          example: "2.0.0"
+        features:
+          type: object
+          properties:
+            aiRecommendations:
+              type: string
+              example: "✅ Active"
+            gamification:
+              type: string
+              example: "✅ Active"
+
+    # User Schemas
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        role:
+          type: string
+          enum: [user, admin, manager]
+          example: "user"
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+        bio:
+          type: string
+          example: "Software developer passionate about productivity"
+        skills:
+          type: array
+          items:
+            type: string
+          example: ["JavaScript", "Node.js", "React"]
+        department:
+          type: string
+          example: "Engineering"
+        isActive:
+          type: boolean
+          example: true
+        preferences:
+          type: object
+          properties:
+            theme:
+              type: string
+              enum: [light, dark]
+            notifications:
+              type: object
+              properties:
+                email:
+                  type: boolean
+                push:
+                  type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRegistration:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+          enum: [user, admin, manager]
+        phoneNumber:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            token:
+              type: string
+
+    UsersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    UserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/User'
+
+    # Task Schemas
+    Task:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        title:
+          type: string
+          example: "Complete project documentation"
+        description:
+          type: string
+          example: "Write comprehensive API documentation"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          example: "high"
+        status:
+          type: string
+          enum: [pending, in-progress, completed, cancelled]
+          example: "in-progress"
+        category:
+          $ref: '#/components/schemas/Category'
+        assignedTo:
+          $ref: '#/components/schemas/User'
+        dueDate:
+          type: string
+          format: date-time
+        estimatedHours:
+          type: number
+          minimum: 0.5
+          maximum: 40
+          example: 8
+        actualHours:
+          type: number
+          minimum: 0
+          example: 6
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["documentation", "urgent"]
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+              url:
+                type: string
+              uploadDate:
+                type: string
+                format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        isArchived:
+          type: boolean
+          default: false
+        isOverdue:
+          type: boolean
+          readOnly: true
+        progressPercentage:
+          type: number
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TaskCreate:
+      type: object
+      required:
+        - title
+        - category
+        - assignedTo
+        - dueDate
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        status:
+          type: string
+          enum: [pending, in-progress, completed, cancelled]
+        category:
+          type: string
+          description: Category ID
+        assignedTo:
+          type: string
+          description: User ID
+        dueDate:
+          type: string
+          format: date-time
+        estimatedHours:
+          type: number
+          minimum: 0.5
+          maximum: 40
+        tags:
+          type: array
+          items:
+            type: string
+
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        status:
+          type: string
+          enum: [pending, in-progress, completed, cancelled]
+        category:
+          type: string
+        assignedTo:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        estimatedHours:
+          type: number
+          minimum: 0.5
+          maximum: 40
+        actualHours:
+          type: number
+          minimum: 0
+        tags:
+          type: array
+          items:
+            type: string
+
+    TasksResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            tasks:
+              type: array
+              items:
+                $ref: '#/components/schemas/Task'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    TaskResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Task'
+
+    # Category Schemas
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          example: "Development"
+        description:
+          type: string
+          example: "Software development tasks"
+        color:
+          type: string
+          example: "#3498db"
+        icon:
+          type: string
+          example: "code"
+        createdAt:
+          type: string
+          format: date-time
+
+    CategoryCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        icon:
+          type: string
+
+    CategoriesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+
+    # Habit Schemas
+    Habit:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          example: "Morning Exercise"
+        description:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly]
+        target:
+          type: number
+          example: 30
+        unit:
+          type: string
+          example: "minutes"
+        user:
+          type: string
+        streak:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+
+    HabitCreate:
+      type: object
+      required:
+        - name
+        - frequency
+        - user
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly]
+        target:
+          type: number
+        unit:
+          type: string
+        user:
+          type: string
+
+    HabitsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Habit'
+
+    # Gamification Schemas
+    GamificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              type: string
+            level:
+              type: number
+              example: 5
+            xp:
+              type: number
+              example: 1250
+            xpToNextLevel:
+              type: number
+              example: 300
+            streaks:
+              type: object
+              properties:
+                tasks:
+                  type: object
+                  properties:
+                    current:
+                      type: number
+                    longest:
+                      type: number
+                login:
+                  type: object
+                  properties:
+                    current:
+                      type: number
+                    longest:
+                      type: number
+            badges:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  earnedAt:
+                    type: string
+                    format: date-time
+
+    # AI Recommendations Schema
+    RecommendationsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: "time-based"
+              title:
+                type: string
+                example: "Morning Focus Session"
+              reason:
+                type: string
+                example: "Most productive hours for deep work"
+              priority:
+                type: string
+                enum: [low, medium, high]
+              estimatedTime:
+                type: number
+                example: 120
+              xpBonus:
+                type: number
+                example: 50
+
+    # Common Schemas
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+        totalPages:
+          type: integer
+        totalItems:
+          type: integer
+        hasNext:
+          type: boolean
+        hasPrev:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Health
+    description: API health and system status
+  - name: Users
+    description: User management and authentication
+  - name: Tasks
+    description: Task management operations
+  - name: Categories
+    description: Task category management
+  - name: Habits
+    description: Habit tracking and management
+  - name: Gamification
+    description: Gamification features and progress
+  - name: AI Recommendations
+    description: AI-powered task recommendations

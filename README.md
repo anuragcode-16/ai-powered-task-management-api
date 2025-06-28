@@ -47,6 +47,7 @@
 - [💡 Usage Examples](#-usage-examples)
 - [🔧 Environment Setup](#-environment-setup)
 - [🧪 Testing](#-testing)
+- [🤖 Keploy API Testing](#-keploy-api-testing)
 - [🚀 Deployment](#-deployment)
 
 ## 🚀 Quick Start
@@ -387,6 +388,126 @@ curl -X POST http://localhost:5000/api/v1/habits/HABIT_ID/complete \
   -H "Content-Type: application/json" \
   -d '{"count": 1}'
 ```
+
+### Unit & Integration Testing
+```bash
+# Run all tests
+npm test
+
+# Run unit tests only
+npm run test:unit
+
+# Run integration tests
+npm run test:integration
+
+# Run API tests
+npm run test:api
+
+# Generate coverage report
+npm run test:coverage
+```
+
+## 🤖 Keploy API Testing
+
+This project integrates with **Keploy** for AI-powered API testing and CI/CD automation.
+
+### 📋 OpenAPI Specification
+
+The API includes a comprehensive OpenAPI 3.0 specification (`openapi.yaml`) that documents all endpoints:
+
+- **25+ API endpoints** across 6 major modules
+- **Complete request/response schemas** for all data models  
+- **Authentication flows** with JWT bearer tokens
+- **Error response patterns** for comprehensive testing
+- **Example payloads** for each endpoint
+
+### 🔄 Automated CI/CD Testing
+
+**GitHub Actions Workflow**: `.github/workflows/keploy-api-testing.yml`
+
+#### Workflow Features:
+- ✅ **Automated API Testing** with Keploy AI
+- ✅ **MongoDB Integration** with service containers
+- ✅ **Real API Calls** testing all CRUD operations
+- ✅ **Error Scenario Testing** for edge cases
+- ✅ **JWT Authentication** flow validation
+- ✅ **Test Coverage Reports** generation
+- ✅ **Artifact Storage** for test results
+
+#### Test Coverage:
+- 🔍 **Health Check** - System status validation
+- 👤 **Authentication** - Registration, login, JWT validation
+- 📝 **Task CRUD** - Complete task lifecycle testing
+- 📂 **Category Management** - Category operations
+- 🤖 **AI Recommendations** - ML-powered suggestions
+- 🎮 **Gamification** - XP, levels, achievements
+- 📊 **Habit Tracking** - Streak and completion analytics
+- ❌ **Error Handling** - Invalid requests and edge cases
+
+### 🧪 Manual Testing with Keploy
+
+#### Prerequisites:
+```bash
+# Install Keploy CLI
+curl --silent --location "https://github.com/keploy/keploy/releases/latest/download/keploy_linux_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/keploy /usr/local/bin
+```
+
+#### Record API Tests:
+```bash
+# Start your API server
+npm start
+
+# Record API interactions
+keploy record -c "node app.js" --delay 10
+
+# Execute test scenarios (see keploy-test-commands.md)
+```
+
+#### Run Recorded Tests:
+```bash
+# Replay tests with Keploy
+keploy test -c "node app.js" --delay 10 --coverage
+```
+
+### 📝 Test Commands Reference
+
+See `keploy-test-commands.md` for comprehensive cURL commands covering:
+- **User Authentication Flow**
+- **Task Management Operations**
+- **Category and Habit CRUD**
+- **AI Features Testing**
+- **Error Scenario Validation**
+
+### 🏆 Test Results
+
+The CI/CD pipeline generates:
+- **Test Execution Reports** - Pass/fail status for all endpoints
+- **Coverage Metrics** - Code coverage from Jest + Keploy
+- **Performance Data** - Response time analytics
+- **Error Analysis** - Detailed error scenario testing
+
+### 📊 Keploy Dashboard Integration
+
+After running tests, view results at [app.keploy.io](https://app.keploy.io):
+- **Visual Test Reports** with pass/fail status
+- **API Performance Metrics** 
+- **Request/Response Analysis**
+- **AI-Generated Test Insights**
+
+### 🎯 Session 4 Completion Status
+
+✅ **Task 1 Completed - API Testing with AI:**
+- ✅ OpenAPI Schema created (`openapi.yaml`)
+- ✅ Keploy AI testing integrated
+- ✅ CI/CD pipeline configured
+- ✅ All tests passing successfully
+- ✅ Comprehensive test coverage achieved
+
+**Screenshot Evidence:**
+- [See CI/CD Pipeline Results](../../actions)
+- [View Keploy Dashboard Reports](https://app.keploy.io)
+- [OpenAPI Documentation](./openapi.yaml)
 
 ## 🚀 Deployment
 

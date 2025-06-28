@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>API Call Recorder</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1><img id="logo" src="images/keploy-logo.png" alt="Keploy Logo" /> API Test Recorder</h1>
+
+    <!-- login button -->
+    <button id="loginBtn" class="btn loginBtn">Login</button>
+    <button id="logoutBtn" class="btn logoutBtn" style="display:none;">Logout</button>
+
+    <button id="recordBtn" class="btn record">Record API Calls</button>
+
+    <div class="status">
+      <div id="recordStatus" class="record-status">Recording...</div>
+      <div>Captured calls: <span id="apiCount" class="api-count">0</span></div>
+      <div>Complete req/resp: <span id="completeCount" class="complete-count">0</span></div>
+
+      <div class="info-text">If your count is 0, try the Debug button to fix records</div>
+      <div class="debug-section">
+        <button id="checkRecordingBtn" class="btn debug">Check Status</button>
+        <button id="debugBtn" class="btn debug">Debug</button>
+        <button id="resetBtn" class="btn reset">Reset DB</button>
+      </div>
+    </div>
+
+    <div id="exportSection" class="export-section">
+      <div class="export-header">Export Configuration</div>
+
+      <div class="export-controls">
+        <div class="control-group">
+          <label class="control-label">Export Format</label>
+          <select id="exportFormat" class="export-format">
+            <option value="curl">cURL Commands</option>
+            <option value="json">JSON Format</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">URL Filter (Optional)</label>
+          <div class="url-filter-container">
+            <input type="text" id="baseUrlFilter" class="base-url-input" placeholder="e.g., https://api.example.com"
+              title="Only export requests that start with this URL" />
+            <button id="urlSelectorBtn" class="url-selector-btn" title="Select from captured URLs">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="exportBtn" class="export-btn">Export Data</button>
+          <button id="copyBtn" class="copy-btn">Copy</button>
+        </div>
+
+        <button id="generateTestsBtn" class="generate-tests-btn" style="display:none;">Generate Tests</button>
+
+      </div>
+
+      <div class="cleanup-section">
+        <button id="cleanupBtn" class="cleanup-btn">Cleanup Incomplete Requests</button>
+      </div>
+
+      <div class="export-info">
+        Export your recorded API calls for testing and documentation
+      </div>
+    </div>
+  </div>
+
+  <div id="urlSelectorModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Select URL Filter</h3>
+        <button id="closeModalBtn" class="close-btn" title="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="urlSearchInput" class="search-input" placeholder="Search URLs" />
+            <button id="clearSearchBtn" class="clear-search-btn" title="Clear search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="url-list-container">
+          <div class="url-list-header">
+            <span class="captured-urls-label">Captured URLs (<span id="urlCount">0</span>)</span>
+            <button id="selectAllBtn" class="select-all-btn">Clear</button>
+          </div>
+          <div id="urlList" class="url-list">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <span>Loading URLs...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="applyUrlFilter" class="apply-btn">Apply Filter</button>
+        <button id="cancelUrlFilter" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/popup.js" type="module"></script>
+</body>
+
+</html>

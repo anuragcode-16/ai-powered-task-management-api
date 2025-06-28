@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Keploy API Test Recorder",
+  "version": "1.2.0",
+  "description": "Records JSON API calls from Web App interactions and send to Keploy.io as input for generating complete API test flows.",
+  "icons": {
+    "16": "images/logo16.png",
+    "48": "images/logo48.png",
+    "128": "images/logo128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/logo16.png",
+      "48": "images/logo48.png",
+      "128": "images/logo128.png"
+    }
+  },
+  "permissions": [
+    "webRequest",
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content.js"]
+    }
+  ]
+}
